@@ -1,76 +1,72 @@
-from __future__ import annotations
-
-from typing import Any, Dict, Optional, Sequence, Tuple
+## Task 0.4
+## Modules
 
 
 class Module:
     """
-    Modules form a tree that store parameters and other
-    submodules. They make up the basis of neural network stacks.
-
     Attributes:
-        _modules : Storage of the child modules
-        _parameters : Storage of the module's parameters
-        training : Whether the module is in training mode or evaluation mode
+        _modules (dict of name x :class:`Module`): Storage of the child modules
+        _parameters (dict of name x :class:`Parameter`): Storage of the module's parameters
+        mode (string): Mode of operation, can be {"train", "eval"}.
 
     """
 
-    _modules: Dict[str, Module]
-    _parameters: Dict[str, Parameter]
-    training: bool
-
-    def __init__(self) -> None:
+    def __init__(self):
         self._modules = {}
         self._parameters = {}
-        self.training = True
+        self.mode = "train"
 
-    def modules(self) -> Sequence[Module]:
-        "Return the direct child modules of this module."
-        m: Dict[str, Module] = self.__dict__["_modules"]
-        return list(m.values())
+    def modules(self):
+        "Return the child modules of this module."
+        return self.__dict__["_modules"].values()
 
-    def train(self) -> None:
+    def train(self):
         "Set the mode of this module and all descendent modules to `train`."
-        # TODO: Implement for Task 0.4.
-        raise NotImplementedError("Need to implement for Task 0.4")
+        self.mode = 'train'
+        for module in self.modules():
+            module.train()
 
-    def eval(self) -> None:
+    def eval(self):
         "Set the mode of this module and all descendent modules to `eval`."
-        # TODO: Implement for Task 0.4.
-        raise NotImplementedError("Need to implement for Task 0.4")
+        self.mode = 'eval'
+        for module in self.modules():
+            module.eval()
 
-    def named_parameters(self) -> Sequence[Tuple[str, Parameter]]:
+    def named_parameters(self):
         """
         Collect all the parameters of this module and its descendents.
 
 
         Returns:
-            The name and `Parameter` of each ancestor parameter.
+            dict: Each name (key) and :class:`Parameter` (value) under this module.
         """
-        # TODO: Implement for Task 0.4.
-        raise NotImplementedError("Need to implement for Task 0.4")
+        named_params = {}
+        for module_name, module in self._modules.items():
+            for name, nested_module in module.named_parameters().items():
+                named_params[f"{module_name}.{name}"] = nested_module
+        for param_name, param in self._parameters.items():
+            named_params[param_name] = param
+        return named_params
 
-    def parameters(self) -> Sequence[Parameter]:
-        "Enumerate over all the parameters of this module and its descendents."
-        # TODO: Implement for Task 0.4.
-        raise NotImplementedError("Need to implement for Task 0.4")
+    def parameters(self):
+        return self.named_parameters().values()
 
-    def add_parameter(self, k: str, v: Any) -> Parameter:
+    def add_parameter(self, k, v):
         """
         Manually add a parameter. Useful helper for scalar parameters.
 
         Args:
-            k: Local name of the parameter.
-            v: Value for the parameter.
+            k (str): Local name of the parameter.
+            v (value): Value for the parameter.
 
         Returns:
-            Newly created parameter.
+            Parameter: Newly created parameter.
         """
-        val = Parameter(v, k)
+        val = Parameter(v)
         self.__dict__["_parameters"][k] = val
         return val
 
-    def __setattr__(self, key: str, val: Parameter) -> None:
+    def __setattr__(self, key, val):
         if isinstance(val, Parameter):
             self.__dict__["_parameters"][key] = val
         elif isinstance(val, Module):
@@ -78,25 +74,29 @@ class Module:
         else:
             super().__setattr__(key, val)
 
-    def __getattr__(self, key: str) -> Any:
+    def __getattr__(self, key):
         if key in self.__dict__["_parameters"]:
             return self.__dict__["_parameters"][key]
 
         if key in self.__dict__["_modules"]:
             return self.__dict__["_modules"][key]
-        return None
 
-    def __call__(self, *args: Any, **kwargs: Any) -> Any:
+        return self.__getattribute__(key)
+
+    def __call__(self, *args, **kwargs):
         return self.forward(*args, **kwargs)
 
-    def __repr__(self) -> str:
-        def _addindent(s_: str, numSpaces: int) -> str:
-            s2 = s_.split("\n")
-            if len(s2) == 1:
+    def forward(self):
+        assert False, "Not Implemented"
+
+    def __repr__(self):
+        def _addindent(s_, numSpaces):
+            s = s_.split("\n")
+            if len(s) == 1:
                 return s_
-            first = s2.pop(0)
-            s2 = [(numSpaces * " ") + line for line in s2]
-            s = "\n".join(s2)
+            first = s.pop(0)
+            s = [(numSpaces * " ") + line for line in s]
+            s = "\n".join(s)
             s = first + "\n" + s
             return s
 
@@ -125,24 +125,16 @@ class Parameter:
     any value for testing.
     """
 
-    def __init__(self, x: Any, name: Optional[str] = None) -> None:
+    def __init__(self, x=None):
         self.value = x
-        self.name = name
         if hasattr(x, "requires_grad_"):
             self.value.requires_grad_(True)
-            if self.name:
-                self.value.name = self.name
 
-    def update(self, x: Any) -> None:
+    def update(self, x):
         "Update the parameter value."
         self.value = x
         if hasattr(x, "requires_grad_"):
             self.value.requires_grad_(True)
-            if self.name:
-                self.value.name = self.name
 
-    def __repr__(self) -> str:
+    def __repr__(self):
         return repr(self.value)
-
-    def __str__(self) -> str:
-        return str(self.value)
