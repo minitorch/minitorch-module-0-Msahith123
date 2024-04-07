@@ -5,7 +5,7 @@ Collection of the core mathematical operators used throughout the code base.
 import math
 from typing import Callable, Iterable
 
-# ## Task 0.1
+# ## Task 0.
 #
 # Implementation of a prelude of elementary functions.
 
