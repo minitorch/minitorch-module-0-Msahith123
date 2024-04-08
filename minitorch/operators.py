@@ -12,63 +12,46 @@ from typing import Callable, Iterable
 
 def mul(x: float, y: float) -> float:
     "$f(x, y) = x * y$"
-    # TODO: Implement for Task 0.1.
-    return round(x * y, 2)
-    raise NotImplementedError("Need to implement for Task 0.1")
+    return x * y
 
 
 def id(x: float) -> float:
     "$f(x) = x$"
-    # TODO: Implement for Task 0.1.
     return x
-    raise NotImplementedError("Need to implement for Task 0.1")
 
 
 def add(x: float, y: float) -> float:
     "$f(x, y) = x + y$"
-    # TODO: Implement for Task 0.1.
     return x + y
-    raise NotImplementedError("Need to implement for Task 0.1")
 
 
 def neg(x: float) -> float:
     "$f(x) = -x$"
-    # TODO: Implement for Task 0.1.
     return -x
-    raise NotImplementedError("Need to implement for Task 0.1")
 
 
 def lt(x: float, y: float) -> float:
     "$f(x) =$ 1.0 if x is less than y else 0.0"
-    # TODO: Implement for Task 0.1.
-    return 1.0 if x <= y else 0.0
-    raise NotImplementedError("Need to implement for Task 0.1")
+    return 1.0 if x < y else 0.0
 
 
 def eq(x: float, y: float) -> float:
     "$f(x) =$ 1.0 if x is equal to y else 0.0"
-    # TODO: Implement for Task 0.1.
-    return 1.0 if x==y else 0.0
-    raise NotImplementedError("Need to implement for Task 0.1")
+    return 1.0 if x == y else 0.0
 
 
 def max(x: float, y: float) -> float:
     "$f(x) =$ x if x is greater than y else y"
-    # TODO: Implement for Task 0.1.
     return x if x > y else y
-    raise NotImplementedError("Need to implement for Task 0.1")
 
 
 def is_close(x: float, y: float) -> float:
     "$f(x) = |x - y| < 1e-2$"
-    # TODO: Implement for Task 0.1.
-    value = round(abs(x - y), 2) <= 5e-2
-    return value
-    raise NotImplementedError("Need to implement for Task 0.1")
+    return abs(x - y) < 1e-2
 
 
 def sigmoid(x: float) -> float:
-    r"""
+    """
     $f(x) =  \frac{1.0}{(1.0 + e^{-x})}$
 
     (See https://en.wikipedia.org/wiki/Sigmoid_function )
@@ -79,12 +62,11 @@ def sigmoid(x: float) -> float:
 
     for stability.
     """
-    # TODO: Implement for Task 0.1.
-    numerator = 1.0
-    denominator = 1 + (math.e ** -(x))
-    value = numerator / denominator
-    return round(value, 2)
-    raise NotImplementedError("Need to implement for Task 0.1")
+    if x >= 0:
+        return 1.0 / (1.0 + math.exp(-x))
+    else:
+        return math.exp(x) / (1.0 + math.exp(x))
+
 
 
 def relu(x: float) -> float:
@@ -93,9 +75,7 @@ def relu(x: float) -> float:
 
     (See https://en.wikipedia.org/wiki/Rectifier_(neural_networks) .)
     """
-    # TODO: Implement for Task 0.1.
     return x if x > 0 else 0
-    raise NotImplementedError("Need to implement for Task 0.1")
 
 
 EPS = 1e-6
@@ -112,31 +92,26 @@ def exp(x: float) -> float:
 
 
 def log_back(x: float, d: float) -> float:
-    r"If $f = log$ as above, compute $d \times f'(x)$"
-    # TODO: Implement for Task 0.1.
-    return d * inv(x)
-    raise NotImplementedError("Need to implement for Task 0.1")
+    "If $f = log$ as above, compute $d \times f'(x)$"
+    f_prime = 1 / x
+    return d * f_prime
 
 
 def inv(x: float) -> float:
     "$f(x) = 1/x$"
-    # TODO: Implement for Task 0.1.
-    return round(1/(x+EPS), 2)
-    raise NotImplementedError("Need to implement for Task 0.1")
+    return 1 / x
 
 
 def inv_back(x: float, d: float) -> float:
-    r"If $f(x) = 1/x$ compute $d \times f'(x)$"
-    # TODO: Implement for Task 0.1.
-    return d * (-1 * inv(x**2))
-    raise NotImplementedError("Need to implement for Task 0.1")
+    "If $f(x) = 1/x$ compute $d \times f'(x)$"
+    f_prime = -1 / x ** 2
+    return d * f_prime
 
 
 def relu_back(x: float, d: float) -> float:
-    r"If $f = relu$ compute $d \times f'(x)$"
-    # TODO: Implement for Task 0.1.
-    return d * 1 if x > 0 else 0
-    raise NotImplementedError("Need to implement for Task 0.1")
+    "If $f = relu$ compute $d \times f'(x)$"
+    f_prime = 1 if x > 0 else 0
+    return d * f_prime
 
 
 # ## Task 0.3
@@ -157,21 +132,16 @@ def map(fn: Callable[[float], float]) -> Callable[[Iterable[float]], Iterable[fl
         A function that takes a list, applies `fn` to each element, and returns a
          new list
     """
-    # TODO: Implement for Task 0.3.
-    def iterator_func(ls):
-        return [fn(i) for i in ls]
-    
-    return iterator_func
-    raise NotImplementedError("Need to implement for Task 0.3")
+    def apply(ls: Iterable[float]) -> Iterable[float]:
+        return [fn(x) for x in ls]
+    return apply
 
 
 def negList(ls: Iterable[float]) -> Iterable[float]:
     "Use `map` and `neg` to negate each element in `ls`"
-    # TODO: Implement for Task 0.3.
-    mapper = map(neg)
-    result = mapper(ls)
-    return result
-    raise NotImplementedError("Need to implement for Task 0.3")
+    negls: Callable[[Iterable[float]], Iterable[float]] = map(neg)
+    return negls(ls)
+
 
 
 def zipWith(
@@ -190,29 +160,21 @@ def zipWith(
          applying fn(x, y) on each pair of elements.
 
     """
-    # TODO: Implement for Task 0.3.
-    def zipper(ls1, ls2):
-        res = []
-        for i,j in zip(ls1, ls2):
-            res.append(fn(i, j))
-        return res
-    return zipper
-    raise NotImplementedError("Need to implement for Task 0.3")
+    def zp(ls1: Iterable[float], ls2: Iterable[float]) -> Iterable[float]:
+        return [fn(x, y) for x, y in zip(ls1, ls2)]
+    return zp
 
 
 def addLists(ls1: Iterable[float], ls2: Iterable[float]) -> Iterable[float]:
     "Add the elements of `ls1` and `ls2` using `zipWith` and `add`"
-    # TODO: Implement for Task 0.3.
-    zipper = zipWith(add)
-    result = zipper(ls1, ls2)
-    return result
-    raise NotImplementedError("Need to implement for Task 0.3")
+    addls: Callable[[Iterable[float], Iterable[float]], Iterable[float]] = zipWith(add)
+    return addls(ls1, ls2)
 
 
 def reduce(
     fn: Callable[[float, float], float], start: float
 ) -> Callable[[Iterable[float]], float]:
-    r"""
+    """
     Higher-order reduce.
 
     Args:
@@ -224,29 +186,21 @@ def reduce(
          $x_1 \ldots x_n$ and computes the reduction :math:`fn(x_3, fn(x_2,
          fn(x_1, x_0)))`
     """
-    # TODO: Implement for Task 0.3.
-    def reduce_func(ls):
-        temp = start
-        for i in  ls:
-            temp = fn(temp, i)
-        return temp
-    return reduce_func
-    raise NotImplementedError("Need to implement for Task 0.3")
+    def rd(ls: Iterable[float]) -> float:
+        res = start
+        for num in ls:
+            res = fn(num, res)
+        return res
+    return rd
 
 
 def sum(ls: Iterable[float]) -> float:
     "Sum up a list using `reduce` and `add`."
-    # TODO: Implement for Task 0.3.
-    adder = reduce(add, 0.0)
-    ans = adder(ls)
-    return ans
-    raise NotImplementedError("Need to implement for Task 0.3")
+    sumls: Callable[[Iterable[float]], float] = reduce(add, 0.0)
+    return sumls(ls)
 
 
 def prod(ls: Iterable[float]) -> float:
     "Product of a list using `reduce` and `mul`."
-    # TODO: Implement for Task 0.3.
-    red = reduce(mul, 1.0)
-    ans = red(ls)
-    return ans
-    raise NotImplementedError("Need to implement for Task 0.3")
+    prodls: Callable[[Iterable[float]], float] = reduce(mul, 1.0)
+    return prodls(ls)
