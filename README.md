@@ -6,3 +6,5 @@
 * Docs: https://minitorch.github.io/
 
 * Overview: https://minitorch.github.io/module0.html
+
+![Screenshot 2024-04-08 155903](https://github.com/minitorch/minitorch-module-0-Msahith123/assets/157946101/cf8a8a99-ea5e-41d7-9282-f29fd28d0f2f)
